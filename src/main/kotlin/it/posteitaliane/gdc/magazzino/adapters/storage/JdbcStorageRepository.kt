@@ -15,10 +15,6 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
         const val POSITIONS_QUERY:String = "SELECT Posizione FROM posizioni WHERE NomeDc = ?"
     }
 
-    override fun cancelOrder(order: Order) {
-        TODO("Not yet implemented")
-    }
-
     override fun positionsAt(location: String): List<String> {
         return template.queryForList(POSITIONS_QUERY, String::class.java)
     }
