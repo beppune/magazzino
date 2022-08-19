@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 @Repository
 class JdbcStorageRepository(val template:JdbcTemplate) : StorageRepository {
 
-    companion object {
+    private companion object {
         val SN_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE Seriale = ? LIMIT 1"
         val PT_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE PtNumber = ? LIMIT 1"
     }

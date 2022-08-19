@@ -21,9 +21,9 @@ class TestJdbcStorageRepository {
 
     @Test
     fun `should find specified sn`() {
-        every { template.queryForObject(eq(JdbcStorageRepository.SN_QUERY), Int::class.java, any()) } returns 1
+        every { template.queryForObject(any(), Int::class.java, any()) } returns 1
 
-        var res = repo.snExists("SNEXISTS")
+        val res = repo.snExists("SNEXISTS")
 
         verify { template.queryForObject(any(), Int::class.java, any()) }
 
@@ -33,9 +33,9 @@ class TestJdbcStorageRepository {
 
     @Test
     fun `should not find specified pt`() {
-        every { template.queryForObject(eq(JdbcStorageRepository.SN_QUERY), Int::class.java, any()) } returns 0
+        every { template.queryForObject(any(), Int::class.java, any()) } returns 0
 
-        var res = repo.snExists("SNNOTEXISTS")
+        val res = repo.snExists("SNNOTEXISTS")
 
         assertThat(res).isFalse
 
@@ -43,9 +43,9 @@ class TestJdbcStorageRepository {
 
     @Test
     fun `should not find specified pt if its null`() {
-        every { template.queryForObject(eq(JdbcStorageRepository.SN_QUERY), Int::class.java, null) } returns 0
+        every { template.queryForObject(any(), Int::class.java, null) } returns 0
 
-        var res = repo.snExists(null)
+        val res = repo.snExists(null)
 
         assertThat(res).isFalse
 
@@ -53,9 +53,9 @@ class TestJdbcStorageRepository {
 
     @Test
     fun `should find specified pt`() {
-        every { template.queryForObject(eq(JdbcStorageRepository.PT_QUERY), Int::class.java, any()) } returns 1
+        every { template.queryForObject(any(), Int::class.java, any()) } returns 1
 
-        var res = repo.ptExists("SNEXISTS")
+        val res = repo.ptExists("SNEXISTS")
 
         verify { template.queryForObject(any(), Int::class.java, any()) }
 
@@ -65,9 +65,9 @@ class TestJdbcStorageRepository {
 
     @Test
     fun `should not find specified sn`() {
-        every { template.queryForObject(eq(JdbcStorageRepository.PT_QUERY), Int::class.java, any()) } returns 0
+        every { template.queryForObject(any(), Int::class.java, any()) } returns 0
 
-        var res = repo.ptExists("SNNOTEXISTS")
+        val res = repo.ptExists("SNNOTEXISTS")
 
         assertThat(res).isFalse
 
@@ -75,9 +75,9 @@ class TestJdbcStorageRepository {
 
     @Test
     fun `should not find specified sn if its null`() {
-        every { template.queryForObject(eq(JdbcStorageRepository.PT_QUERY), Int::class.java, null) } returns 0
+        every { template.queryForObject(any(), Int::class.java, null) } returns 0
 
-        var res = repo.ptExists(null)
+        val res = repo.ptExists(null)
 
         assertThat(res).isFalse
 
