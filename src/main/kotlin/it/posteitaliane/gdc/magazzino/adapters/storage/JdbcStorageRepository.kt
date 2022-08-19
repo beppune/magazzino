@@ -7,11 +7,11 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 
 @Repository
-class JdbcStorageRepository(val template:JdbcTemplate) : StorageRepository {
+class JdbcStorageRepository(private val template:JdbcTemplate) : StorageRepository {
 
     private companion object {
-        val SN_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE Seriale = ? LIMIT 1"
-        val PT_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE PtNumber = ? LIMIT 1"
+        const val SN_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE Seriale = ? LIMIT 1"
+        const val PT_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE PtNumber = ? LIMIT 1"
     }
 
     override fun cancelOrder(order: Order) {
@@ -22,8 +22,8 @@ class JdbcStorageRepository(val template:JdbcTemplate) : StorageRepository {
         TODO("Not yet implemented")
     }
 
-    override fun ptExists(pt: String?): Boolean {
-        val count:Int = template.queryForObject(PT_QUERY, Int::class.java, pt)
+    override fun ptExists(s: String?): Boolean {
+        val count:Int = template.queryForObject(PT_QUERY, Int::class.java, s)
 
         return count != 0
     }
