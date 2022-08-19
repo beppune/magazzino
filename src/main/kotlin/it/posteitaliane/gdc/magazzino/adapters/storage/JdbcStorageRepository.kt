@@ -12,7 +12,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
     private companion object {
         const val SN_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE Seriale = ? LIMIT 1"
         const val PT_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE PtNumber = ? LIMIT 1"
-        const val POSITIONS_QUERY = "SELECT Posizione FROM posizioni WHERE NomeDc = ?"
+        const val POSITIONS_QUERY:String = "SELECT Posizione FROM posizioni WHERE NomeDc = ?"
     }
 
     override fun cancelOrder(order: Order) {
