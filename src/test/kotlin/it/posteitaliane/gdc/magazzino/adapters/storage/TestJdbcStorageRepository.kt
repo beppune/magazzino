@@ -4,20 +4,14 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import it.posteitaliane.gdc.magazzino.core.Area
-import it.posteitaliane.gdc.magazzino.core.MutableOrder
-import it.posteitaliane.gdc.magazzino.core.Operator
-import it.posteitaliane.gdc.magazzino.core.Permission
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.simple.SimpleJdbcCall
 
 class TestJdbcStorageRepository {
 
-    private var template:JdbcTemplate = mockk()
+    private val template:JdbcTemplate = mockk()
     private val repo:JdbcStorageRepository = JdbcStorageRepository(template)
 
     @BeforeEach
@@ -96,21 +90,5 @@ class TestJdbcStorageRepository {
         val res = repo.positionsAt("DC TORINO")
 
         assertThat(res).containsExactly("NOT", "EMPTY", "LIST")
-    }
-
-    @Test
-    fun `should call procedure`() {
-
-        template = mockk(relaxed = true)
-
-        val order:MutableOrder = mockk()
-        every { order.id } returns  "NOT NULL"
-        every { order.uid} returns "notnull"
-
-
-
-        assertThatNoException().isThrownBy { repo.cancelOrder(order) }
-
-
     }
 }
