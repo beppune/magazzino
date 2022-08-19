@@ -4,7 +4,12 @@ import it.posteitaliane.gdc.magazzino.core.Order
 import it.posteitaliane.gdc.magazzino.core.OrderLine
 import it.posteitaliane.gdc.magazzino.core.ports.StorageRepository
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.SqlOutParameter
+import org.springframework.jdbc.core.SqlParameter
+import org.springframework.jdbc.core.simple.SimpleJdbcCall
 import org.springframework.stereotype.Repository
+import java.lang.RuntimeException
+import java.sql.Types
 
 @Repository
 class JdbcStorageRepository(private val template:JdbcTemplate) : StorageRepository {
@@ -15,8 +20,21 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
         const val POSITIONS_QUERY:String = "SELECT Posizione FROM posizioni WHERE NomeDc = ?"
     }
 
-    override fun cancelOrder(order: Order) {
-        TODO("Not yet implemented")
+    override fun cancelOrder(order: Order){
+        val call = SimpleJdbcCall(template)
+            .withProcedureName("rollbackTransaction")
+            .apply {
+                addDeclaredParameter(SqlParameter("ParamUserId", Types.VARCHAR))
+                addDeclaredParameter(SqlOutParameter("stato", Types.VARCHAR))
+                addDeclaredParameter(SqlOutParameter("mess", Types.VARCHAR))
+            }
+
+        val result = call.execute(order.uid)
+
+        if (result["stato"] != "OK" ) {
+            var mess = result["mess"] as String
+            throw Exception(mess)
+        }
     }
 
     override fun positionsAt(location: String): List<String> {
