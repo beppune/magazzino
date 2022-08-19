@@ -82,4 +82,13 @@ class TestJdbcStorageRepository {
         assertThat(res).isFalse
 
     }
+
+    @Test
+    fun `should retrieve position list`() {
+        every { template.queryForList(any(), String::class.java) } returns listOf("NOT", "EMPTY", "LIST")
+
+        val res = repo.positionsAt("DC TORINO")
+
+        assertThat(res).containsExactly("NOT", "EMPTY", "LIST")
+    }
 }

@@ -12,6 +12,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
     private companion object {
         const val SN_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE Seriale = ? LIMIT 1"
         const val PT_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE PtNumber = ? LIMIT 1"
+        const val POSITIONS_QUERY = "SELECT Posizione FROM posizioni WHERE NomeDc = ?"
     }
 
     override fun cancelOrder(order: Order) {
@@ -19,7 +20,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
     }
 
     override fun positionsAt(location: String): List<String> {
-        TODO("Not yet implemented")
+        return template.queryForList(POSITIONS_QUERY, String::class.java)
     }
 
     override fun ptExists(s: String?): Boolean {
