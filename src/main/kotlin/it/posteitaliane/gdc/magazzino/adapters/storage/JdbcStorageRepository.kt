@@ -65,11 +65,10 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
         return count != 0
     }
 
-    override fun registerLoad(order: Order, item: String, position: String, amount: Int): OrderLine {
+    override fun registerLoad(order: Order, item: String, position: String, amount: Int) {
         val(stato, mess) = Load(order.uid, order.id, order.location, position, item, amount,
             null, null, null, null, null, null, null)
         println("===== $stato == $mess")
-        return order.lines[0]
     }
 
     override fun registerOrder(order: Order) {
