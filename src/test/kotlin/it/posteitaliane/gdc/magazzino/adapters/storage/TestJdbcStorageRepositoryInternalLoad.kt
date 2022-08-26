@@ -1,0 +1,46 @@
+package it.posteitaliane.gdc.magazzino.adapters.storage
+
+import io.mockk.every
+import io.mockk.mockk
+import it.posteitaliane.gdc.magazzino.core.MutableOrder
+import it.posteitaliane.gdc.magazzino.core.OrderLine
+import it.posteitaliane.gdc.magazzino.core.OrderSubject
+import it.posteitaliane.gdc.magazzino.core.OrderType
+import org.assertj.core.api.Assertions.*
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.test.context.ActiveProfiles
+
+@JdbcTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("it")
+class TestJdbcStorageRepositoryInternalLoad {
+
+    @Autowired
+    lateinit var template:JdbcTemplate
+
+    @Test
+    fun `should register order`() {
+
+        val repo = JdbcStorageRepository(template)
+
+        var order = mockk<MutableOrder>()
+        every { order.uid } returns "MANZOGI9"
+        every { order.type } returns OrderType.LOAD
+        every { order.subject } returns OrderSubject.INTERNAL
+        every { order.rep } returns "MANZO GIUSEPPE"
+        every { order.location } returns "DC TORINO"
+        every { order.remarks } returns null
+        every { order.lines } returns mutableListOf( OrderLine(order, "MERCE 1", "P1", 10) )
+        every { order::id.set(any()) } answers { callOriginal() }
+        every { order::id.get() } answers { callOriginal() }
+
+        repo.registerOrder(order)
+
+        assertThat(order.id).isNotNull().isNotBlank().isNotEmpty()
+    }
+
+}
