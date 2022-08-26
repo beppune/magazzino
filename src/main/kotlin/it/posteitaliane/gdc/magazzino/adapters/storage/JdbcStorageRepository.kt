@@ -101,7 +101,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
 
                 if (stato2 != 0) {
                     Rollback(uid = o.uid)
-                    throw Exception("LOAD ORDER LINE FAIL: $mess")
+                    throw Exception("LOAD ORDER LINE FAIL: $mess2")
                 }
             }
         }
