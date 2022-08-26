@@ -4,6 +4,7 @@ import it.posteitaliane.gdc.magazzino.core.*
 import it.posteitaliane.gdc.magazzino.core.ports.StorageRepository
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
+import java.sql.Types
 
 @Repository
 class JdbcStorageRepository(private val template:JdbcTemplate) : StorageRepository {
@@ -13,6 +14,15 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
         const val PT_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE PtNumber = ? LIMIT 1"
         const val POSITIONS_QUERY:String = "SELECT Posizione FROM posizioni WHERE NomeDc = ?"
     }
+
+    private val Rollback = MagazzinoApi(template)
+        .build("rollbackTransaction").config()
+
+    private val Commit = MagazzinoApi(template)
+        .build("commitTransaction")
+        .config {
+            inParam("paramNomeDC")
+        }
 
     private val InternalLoad = MagazzinoApi(template)
         .build("inserimentoRicevute")
@@ -27,6 +37,23 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
             outParam("codiceDocumento")
         }
 
+    private val Load = MagazzinoApi(template)
+        .build("carico")
+        .config{
+            inParam("paramNumDoc")
+            inParam("paramNomeDc")
+            inParam("paramPosizioneDc")
+            inParam("paramMerce")
+            inParam("paramQty", Types.INTEGER)
+
+            inParam("paramDestFinale")
+            inParam("paramSerialeDisp")
+            inParam("paramOdaMerce")
+            inParam("paramNoteMerce")
+            inParam("paramTitolare")
+            inParam("paramCodiceCollo")
+            inParam("paramPtnumberDisp")
+        }
 
     override fun positionsAt(location: String): List<String> {
         return template.queryForList(POSITIONS_QUERY, String::class.java)
@@ -39,7 +66,10 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
     }
 
     override fun registerLoad(order: Order, item: String, position: String, amount: Int): OrderLine {
-        TODO("Not yet implemented")
+        val(stato, mess) = Load(order.uid, order.id, order.location, position, item, amount,
+            null, null, null, null, null, null, null)
+        println("===== $stato == $mess")
+        return order.lines[0]
     }
 
     override fun registerOrder(order: Order) {
@@ -56,8 +86,29 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
 
         val(stato, mess, docid) = Call(uid=o.uid, o.location, o.rep, "FITTIZIA", null, o.remarks)
 
-        if(stato==0) o.id = docid
+        if(stato!=0) {
+            Rollback(uid = o.uid)
+            println("INTERNAL LOAD RECEIT FAIL! $mess")
+        }
 
+        o.id = docid
+
+        run loop@ {
+            o.lines.forEach {
+                var (stato2, mess2) = Load(
+                    uid = it.order.uid, it.order.id, it.order.location, it.position, it.item, it.amount,
+                    null, it.sn, null, null, null, null, it.pt
+                )
+
+                if (stato2 != 0) {
+                    Rollback(uid = o.uid)
+                    println("ITEM LOAD FAIL ${it.order.id}! $mess2")
+                    return@loop
+                }
+            }
+        }
+
+        Commit(uid = order.uid, order.location)
     }
 
     override fun snExists(sn: String?): Boolean {

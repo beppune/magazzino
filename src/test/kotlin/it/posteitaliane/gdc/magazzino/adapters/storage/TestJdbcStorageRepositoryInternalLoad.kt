@@ -34,13 +34,19 @@ class TestJdbcStorageRepositoryInternalLoad {
         every { order.rep } returns "MANZO GIUSEPPE"
         every { order.location } returns "DC TORINO"
         every { order.remarks } returns null
-        every { order.lines } returns mutableListOf( OrderLine(order, "MERCE 1", "P1", 10) )
+        every { order.lines } returns mutableListOf( OrderLine(order, "MERCE 1", "A-P10", 10) )
         every { order::id.set(any()) } answers { callOriginal() }
         every { order::id.get() } answers { callOriginal() }
 
         repo.registerOrder(order)
 
+        order.lines.forEach {
+            repo.registerLoad(order, it.item, it.position, it.amount)
+        }
+
         assertThat(order.id).isNotNull().isNotBlank().isNotEmpty()
+
+
     }
 
 }
