@@ -87,7 +87,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
 
         if(stato!=0) {
             Rollback(uid = o.uid)
-            println("INTERNAL LOAD RECEIT FAIL! $mess")
+            throw Exception("CREATE RECEIT FAIL: $mess")
         }
 
         o.id = docid
@@ -101,8 +101,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
 
                 if (stato2 != 0) {
                     Rollback(uid = o.uid)
-                    println("ITEM LOAD FAIL ${it.order.id}! $mess2")
-                    return@loop
+                    throw Exception("LOAD ORDER LINE FAIL: $mess")
                 }
             }
         }

@@ -49,4 +49,57 @@ class TestJdbcStorageRepositoryInternalLoad {
 
     }
 
+    @Test
+    fun `should throw`() {
+
+        val repo = JdbcStorageRepository(template)
+
+        var order = mockk<MutableOrder>()
+        every { order.uid } returns "MANZOGI9"
+        every { order.type } returns OrderType.LOAD
+        every { order.subject } returns OrderSubject.INTERNAL
+        every { order.rep } returns "MANZO GIUSEPPE"
+        every { order.location } returns "INVALID"
+        every { order.remarks } returns null
+        every { order.lines } returns mutableListOf(OrderLine(order, "MERCE 1", "A-P10", 10))
+        every { order::id.set(any()) } answers { callOriginal() }
+        every { order::id.get() } answers { callOriginal() }
+
+        assertThatThrownBy {
+            repo.registerOrder(order)
+
+            order.lines.forEach {
+                repo.registerLoad(order, it.item, it.position, it.amount)
+
+            }
+        }.hasMessageContaining("CREATE RECEIT FAIL")
+
+    }
+    @Test
+    fun `should throw 2`() {
+
+        val repo = JdbcStorageRepository(template)
+
+        var order = mockk<MutableOrder>()
+        every { order.uid } returns "MANZOGI9"
+        every { order.type } returns OrderType.LOAD
+        every { order.subject } returns OrderSubject.INTERNAL
+        every { order.rep } returns "MANZO GIUSEPPE"
+        every { order.location } returns "DC TORINO"
+        every { order.remarks } returns null
+        every { order.lines } returns mutableListOf(OrderLine(order, "MERCE 1", "AP10", 10))
+        every { order::id.set(any()) } answers { callOriginal() }
+        every { order::id.get() } answers { callOriginal() }
+
+        assertThatThrownBy {
+            repo.registerOrder(order)
+
+            order.lines.forEach {
+                repo.registerLoad(order, it.item, it.position, it.amount)
+
+            }
+        }.hasMessageContaining("LOAD ORDER LINE FAIL")
+
+    }
+
 }
