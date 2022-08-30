@@ -4,7 +4,9 @@ import it.posteitaliane.gdc.magazzino.core.*
 import it.posteitaliane.gdc.magazzino.core.ports.StorageRepository
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
+import java.sql.Date
 import java.sql.Types
+import java.util.*
 
 @Repository
 class JdbcStorageRepository(private val template:JdbcTemplate) : StorageRepository {
@@ -13,6 +15,11 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
         const val SN_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE Seriale = ? LIMIT 1"
         const val PT_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE PtNumber = ? LIMIT 1"
         const val POSITIONS_QUERY:String = "SELECT Posizione FROM posizioni WHERE NomeDc = ?"
+        const val ORDER_QUERY = "SELECT " +
+                "ID AS id, UserID AS user, Data AS opdate, Operazione AS operation, NumeroDocInterno AS docid, NomeFornitore AS partner," +
+                "NumeroDoc AS numdoc, DataDocumento AS issuedate, NumeroOda AS oda, Note AS remarks, Destinatario AS receipient, Trasportatore AS hauler, Ora AS hour," +
+                "FileDocumento AS filepath, Note AS remarks, NumeroDocAssociato AS refdoc, vista_doc.NomeDc AS dc, Abbreviazione AS dccode FROM vista_doc,datacenters " +
+                "  WHERE datacenters.NomeDc LIKE vista_doc.NomeDc"
     }
 
     private val Rollback = MagazzinoApi(template)
@@ -54,6 +61,24 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
             inParam("paramCodiceCollo")
             inParam("paramPtnumberDisp")
         }
+
+    override fun findOrders(filter: (Order.() -> Boolean)?): List<Order> {
+        return template.queryForList(ORDER_QUERY)
+            .map {
+                val op = Operator(
+                    it["user"] as String,
+                    Area("TORINO", listOf("TO1")),
+                    Permission.ADMIN)
+
+                val order = MutableOrder(op, (it["issuedate"] as Date).toLocalDate(),
+                    it["dc"] as String,
+                    OrderType.LOAD,
+                    OrderSubject.INTERNAL)
+
+                order
+            }
+            .toList()
+    }
 
     override fun positionsAt(location: String): List<String> {
         return template.queryForList(POSITIONS_QUERY, String::class.java)

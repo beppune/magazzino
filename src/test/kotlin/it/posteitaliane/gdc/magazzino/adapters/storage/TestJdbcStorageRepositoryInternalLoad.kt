@@ -102,4 +102,15 @@ class TestJdbcStorageRepositoryInternalLoad {
 
     }
 
+    @Test
+    fun `should retreive order list`() {
+        val repo = JdbcStorageRepository(template)
+
+        val list = repo.findOrders()
+
+        list.forEach(::println)
+
+        assertThat(list).isNotEmpty
+    }
+
 }
