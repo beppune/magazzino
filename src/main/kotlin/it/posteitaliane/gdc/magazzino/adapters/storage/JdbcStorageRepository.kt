@@ -1,25 +1,32 @@
 package it.posteitaliane.gdc.magazzino.adapters.storage
 
 import it.posteitaliane.gdc.magazzino.core.*
+import it.posteitaliane.gdc.magazzino.core.ports.OperatorRepository
 import it.posteitaliane.gdc.magazzino.core.ports.StorageRepository
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 import java.sql.Date
+import java.sql.Timestamp
 import java.sql.Types
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @Repository
-class JdbcStorageRepository(private val template:JdbcTemplate) : StorageRepository {
+class JdbcStorageRepository(private val template:JdbcTemplate) : StorageRepository, OperatorRepository {
 
     private companion object {
         const val SN_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE Seriale = ? LIMIT 1"
         const val PT_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE PtNumber = ? LIMIT 1"
         const val POSITIONS_QUERY:String = "SELECT Posizione FROM posizioni WHERE NomeDc = ?"
         const val ORDER_QUERY = "SELECT " +
-                "ID AS id, UserID AS user, Data AS opdate, Operazione AS operation, NumeroDocInterno AS docid, NomeFornitore AS partner," +
-                "NumeroDoc AS numdoc, DataDocumento AS issuedate, NumeroOda AS oda, Note AS remarks, Destinatario AS receipient, Trasportatore AS hauler, Ora AS hour," +
-                "FileDocumento AS filepath, Note AS remarks, NumeroDocAssociato AS refdoc, vista_doc.NomeDc AS dc, Abbreviazione AS dccode FROM vista_doc,datacenters " +
-                "  WHERE datacenters.NomeDc LIKE vista_doc.NomeDc"
+                "   ID AS id, UserID AS user, Data AS opdate, Operazione AS operation, NumeroDocInterno AS docid, NomeFornitore AS partner," +
+                "    NumeroDoc AS numdoc, DataDocumento AS issuedate, NumeroOda AS oda, Note AS remarks, Destinatario AS receipient, Trasportatore AS hauler, Ora AS hour," +
+                "    FileDocumento AS filepath, Note AS remarks, NumeroDocAssociato AS refdoc, vista_doc.NomeDc AS dc, Abbreviazione AS dccode" +
+                "    ,t2.tipoOperazione AS op,docsubject(vista_doc.NumeroDocInterno) AS DOCSUBJECT" +
+                "    FROM datacenters," +
+                "    vista_doc JOIN (SELECT DISTINCT tipoOperazione,NumeroDocInterno FROM transazioni ) t2 USING(NumeroDocInterno)" +
+                "    WHERE datacenters.NomeDc LIKE vista_doc.NomeDc;"
     }
 
     private val Rollback = MagazzinoApi(template)
@@ -65,15 +72,27 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
     override fun findOrders(filter: (Order.() -> Boolean)?): List<Order> {
         return template.queryForList(ORDER_QUERY)
             .map {
-                val op = Operator(
-                    it["user"] as String,
-                    Area("TORINO", listOf("TO1")),
-                    Permission.ADMIN)
+                val op = findByUid(it["user"] as String)
 
-                val order = MutableOrder(op, (it["issuedate"] as Date).toLocalDate(),
+                val order = MutableOrder(op, it["opdate"] as LocalDateTime,
                     it["dc"] as String,
-                    OrderType.LOAD,
-                    OrderSubject.INTERNAL)
+                    when(it["op"]) { "CARICO" -> OrderType.LOAD else -> OrderType.UNLOAD },
+                    when(it["DOCSUBJECT"]) { "INTERNAL" -> OrderSubject.INTERNAL else -> OrderSubject.PARTNER })
+
+                order.apply {
+                    partner = it["partner"] as String?
+
+                    if( it["numdoc"] != null ) {
+                        document = Document(it["numdoc"] as String, (it["issuedate"] as Date).toLocalDate(),
+                            partner ?: "POSTE ITALIANE S.P.A.")
+                    }
+
+                    oda = it["oda"] as String?
+                    remarks = it["remarks"] as String?
+                    rep = it["receipient"] as String?
+
+                    filepath = it["filepath"] as String?
+                }
 
                 order
             }
@@ -137,5 +156,9 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
         val count:Int = template.queryForObject(SN_QUERY, Int::class.java, sn)
 
         return count != 0
+    }
+
+    override fun findByUid(uid: String): Operator {
+        return Operator(uid,Area("", listOf()), Permission.READ)
     }
 }
