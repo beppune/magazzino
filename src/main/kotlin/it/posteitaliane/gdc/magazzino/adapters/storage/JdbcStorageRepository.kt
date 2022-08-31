@@ -20,14 +20,10 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
         const val PT_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE PtNumber = ? LIMIT 1"
         const val POSITIONS_QUERY:String = "SELECT Posizione FROM posizioni WHERE NomeDc = ?"
         const val ORDER_QUERY = "SELECT " +
-                "   ID AS id, UserID AS user, Data AS opdate, Operazione AS operation, NumeroDocInterno AS docid, NomeFornitore AS partner," +
-                "    NumeroDoc AS numdoc, DataDocumento AS issuedate, NumeroOda AS oda, Note AS remarks, Destinatario AS receipient, Trasportatore AS hauler, Ora AS hour," +
-                "    FileDocumento AS filepath, Note AS remarks, NumeroDocAssociato AS refdoc, vista_doc.NomeDc AS dc, Abbreviazione AS dccode" +
-                "    ,t2.tipoOperazione AS op,docsubject(vista_doc.NumeroDocInterno) AS DOCSUBJECT" +
-                "    FROM datacenters," +
-                "    vista_doc JOIN (SELECT DISTINCT tipoOperazione,NumeroDocInterno FROM transazioni ) t2 USING(NumeroDocInterno)" +
-                "    WHERE datacenters.NomeDc LIKE vista_doc.NomeDc" +
-                "    LIMIT ?, ?"
+                "id,user,opdate,operation,docid,partner,numdoc,issuedate," +
+                "oda,remarks,receipient,filepath,dc,dccode,op,docsubject" +
+                " FROM view_orders" +
+                " LIMIT ?,?"
     }
 
     private val Rollback = MagazzinoApi(template)
