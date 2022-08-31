@@ -66,6 +66,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
             inParam("paramPtnumberDisp")
         }
 
+    //default: filter:null, offset:0, limit:Int.MAX_VALUE
     override fun findOrders(filter: (Order.() -> Boolean)?, offset:Int, limit:Int): List<Order> {
         val list = template.queryForList(ORDER_QUERY, offset, limit)
             .map {
