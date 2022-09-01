@@ -26,7 +26,8 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
                 "    ,t2.tipoOperazione AS op,docsubject(vista_doc.NumeroDocInterno) AS DOCSUBJECT" +
                 "    FROM datacenters," +
                 "    vista_doc JOIN (SELECT DISTINCT tipoOperazione,NumeroDocInterno FROM transazioni ) t2 USING(NumeroDocInterno)" +
-                "    WHERE datacenters.NomeDc LIKE vista_doc.NomeDc;"
+                "    WHERE datacenters.NomeDc LIKE vista_doc.NomeDc" +
+                "    LIMIT ?, ?"
     }
 
     private val Rollback = MagazzinoApi(template)
@@ -74,7 +75,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
     }
 
     override fun findOrders(filter: (Order.() -> Boolean)?, offset:Int, count:Int): List<Order> {
-        return template.queryForList(ORDER_QUERY)
+        return template.queryForList(ORDER_QUERY, offset, count)
             .map {
                 val op = findByUid(it["user"] as String)
 
