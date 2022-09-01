@@ -113,4 +113,15 @@ class TestJdbcStorageRepositoryInternalLoad {
         assertThat(list).isNotEmpty
     }
 
+    @Test
+    fun `should retreive location list`() {
+        val repo = JdbcStorageRepository(template)
+
+        val list = repo.findLocations()
+
+        list.forEach(::println)
+
+        assertThat(list).isNotEmpty
+    }
+
 }

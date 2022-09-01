@@ -28,6 +28,11 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
                 "    vista_doc JOIN (SELECT DISTINCT tipoOperazione,NumeroDocInterno FROM transazioni ) t2 USING(NumeroDocInterno)" +
                 "    WHERE datacenters.NomeDc LIKE vista_doc.NomeDc" +
                 "    LIMIT ?, ?"
+        const val DC_QUERY = "SELECT " +
+                "NomeDc AS name, Abbreviazione AS code, AreaAppartenenza AS area, BILLCODE AS billcode, ALTNAME AS altname " +
+                "FROM datacenters " +
+                "JOIN BILLS_CODES ON (Abbreviazione = BILLS_CODES.DCCODE) " +
+                "JOIN DCALTNAMES ON (Abbreviazione = DCALTNAMES.DCCODE)"
     }
 
     private val Rollback = MagazzinoApi(template)
@@ -70,8 +75,11 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
             inParam("paramPtnumberDisp")
         }
 
-    override fun findLocations(area: String?) {
-        TODO("Not yet implemented")
+    override fun findLocations(area: String?):List<Location> {
+        return template.queryForList(DC_QUERY, Location::class.java)
+            /*.map {
+                Location(it["name"] as String, it["code"] as String, it["area"] as String, it["altname"] as String, it["billcode"] as String)
+            }*/
     }
 
     override fun findOrders(filter: (Order.() -> Boolean)?, offset:Int, count:Int): List<Order> {

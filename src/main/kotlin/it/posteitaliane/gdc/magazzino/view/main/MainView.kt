@@ -11,6 +11,7 @@ import com.vaadin.flow.data.renderer.Renderer
 import com.vaadin.flow.data.renderer.TextRenderer
 import com.vaadin.flow.router.Route
 import it.posteitaliane.gdc.magazzino.adapters.storage.JdbcStorageRepository
+import it.posteitaliane.gdc.magazzino.core.Location
 import it.posteitaliane.gdc.magazzino.core.Order
 import it.posteitaliane.gdc.magazzino.core.OrderSubject
 import it.posteitaliane.gdc.magazzino.core.OrderType
@@ -35,6 +36,8 @@ class MainView(
 
     private var filter:((Order)->Boolean)? = null
 
+    private var dcs = listOf<Location>()
+
     init {
         setSizeFull()
 
@@ -46,6 +49,8 @@ class MainView(
             } else {
                 filter = null
             }
+
+            dcs = storage.findLocations()
 
             orders.setItems { query ->
                 storage.findOrders(filter, query.offset, query.limit).stream()
@@ -77,9 +82,16 @@ class MainView(
                 }
             ).setHeader("TIPO")
 
-            addColumn("location").apply {
-                setHeader("MAGAZZINO")
-            }
+            addColumn(LitRenderer
+                .of<Order?>("\${item.dcname}")
+                .withProperty("dcname") {
+
+                    val l = dcs.filter { dc ->
+                        dc.name == it.location
+                    }
+                    l[0].name
+                }
+            ).setHeader("MAGAZZINO")
 
             addColumn(
                 LitRenderer
