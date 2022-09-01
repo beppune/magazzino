@@ -20,10 +20,13 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
         const val PT_QUERY:String = "SELECT COUNT(*) FROM vista_giacenze WHERE PtNumber = ? LIMIT 1"
         const val POSITIONS_QUERY:String = "SELECT Posizione FROM posizioni WHERE NomeDc = ?"
         const val ORDER_QUERY = "SELECT " +
-                "id,user,opdate,operation,docid,partner,numdoc,issuedate," +
-                "oda,remarks,receipient,filepath,dc,dccode,op,docsubject" +
-                " FROM view_orders" +
-                " LIMIT ?,?"
+                "   ID AS id, UserID AS user, Data AS opdate, Operazione AS operation, NumeroDocInterno AS docid, NomeFornitore AS partner," +
+                "    NumeroDoc AS numdoc, DataDocumento AS issuedate, NumeroOda AS oda, Note AS remarks, Destinatario AS receipient, Trasportatore AS hauler, Ora AS hour," +
+                "    FileDocumento AS filepath, Note AS remarks, NumeroDocAssociato AS refdoc, vista_doc.NomeDc AS dc, Abbreviazione AS dccode" +
+                "    ,t2.tipoOperazione AS op,docsubject(vista_doc.NumeroDocInterno) AS DOCSUBJECT" +
+                "    FROM datacenters," +
+                "    vista_doc JOIN (SELECT DISTINCT tipoOperazione,NumeroDocInterno FROM transazioni ) t2 USING(NumeroDocInterno)" +
+                "    WHERE datacenters.NomeDc LIKE vista_doc.NomeDc;"
     }
 
     private val Rollback = MagazzinoApi(template)
@@ -66,9 +69,12 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
             inParam("paramPtnumberDisp")
         }
 
-    //default: filter:null, offset:0, limit:Int.MAX_VALUE
-    override fun findOrders(filter: (Order.() -> Boolean)?, offset:Int, limit:Int): List<Order> {
-        val list = template.queryForList(ORDER_QUERY, offset, limit)
+    override fun findLocations(area: String?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun findOrders(filter: (Order.() -> Boolean)?, offset:Int, count:Int): List<Order> {
+        return template.queryForList(ORDER_QUERY)
             .map {
                 val op = findByUid(it["user"] as String)
 
@@ -94,11 +100,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
 
                 order
             }
-
-        if(filter == null)
-            return list
-        else
-            return list.filter(filter)
+            .toList()
     }
 
     override fun positionsAt(location: String): List<String> {
