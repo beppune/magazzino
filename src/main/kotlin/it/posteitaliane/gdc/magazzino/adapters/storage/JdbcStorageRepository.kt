@@ -76,10 +76,16 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
         }
 
     override fun findLocations(area: String?):List<Location> {
-        return template.queryForList(DC_QUERY, Location::class.java)
-            /*.map {
-                Location(it["name"] as String, it["code"] as String, it["area"] as String, it["altname"] as String, it["billcode"] as String)
-            }*/
+        return template.queryForList(DC_QUERY)
+            .map {
+                Location(
+                    name = it["name"] as String,
+                    code = it["code"] as String,
+                    area = it["area"] as String,
+                    altname = it["altname"] as String,
+                    billcode = it["billcode"] as String
+                )
+            }
     }
 
     override fun findOrders(filter: (Order.() -> Boolean)?, offset:Int, count:Int): List<Order> {
