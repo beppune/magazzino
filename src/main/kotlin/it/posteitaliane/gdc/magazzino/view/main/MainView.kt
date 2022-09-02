@@ -1,5 +1,6 @@
 package it.posteitaliane.gdc.magazzino.view.main
 
+import com.vaadin.flow.component.Unit
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
 import com.vaadin.flow.component.grid.Grid
@@ -32,8 +33,6 @@ class MainView(
 
     private val orders: Grid<Order> = Grid(Order::class.java)
 
-    private val checkBox = Checkbox("Solo Carico")
-
     private var filter:((Order)->Boolean)? = null
 
     private var dcs = listOf<Location>()
@@ -41,24 +40,9 @@ class MainView(
     init {
         setSizeFull()
 
-        checkBox.addValueChangeListener {
-            if(checkBox.value) {
-                filter = {
-                    it.type == OrderType.LOAD
-                }
-            } else {
-                filter = null
-            }
-
-            dcs = storage.findLocations()
-
-            orders.setItems { query ->
-                storage.findOrders(filter, query.offset, query.limit).stream()
-            }
-        }
+        dcs = storage.findLocations()
 
         add(H2("Hello Vaadin"), logoutButton)
-        add(checkBox)
 
         orders.apply {
 
