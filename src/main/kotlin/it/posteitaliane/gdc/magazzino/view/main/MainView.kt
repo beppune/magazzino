@@ -1,27 +1,19 @@
 package it.posteitaliane.gdc.magazzino.view.main
 
-import com.vaadin.flow.component.Unit
 import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.checkbox.Checkbox
-import com.vaadin.flow.component.checkbox.CheckboxGroup
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.LitRenderer
-import com.vaadin.flow.data.renderer.LocalDateRenderer
-import com.vaadin.flow.data.renderer.Renderer
-import com.vaadin.flow.data.renderer.TextRenderer
 import com.vaadin.flow.router.Route
 import it.posteitaliane.gdc.magazzino.adapters.storage.JdbcStorageRepository
 import it.posteitaliane.gdc.magazzino.core.Location
 import it.posteitaliane.gdc.magazzino.core.Order
 import it.posteitaliane.gdc.magazzino.core.OrderSubject
 import it.posteitaliane.gdc.magazzino.core.OrderType
-import it.posteitaliane.gdc.magazzino.core.ports.StorageRepository
 import it.posteitaliane.gdc.magazzino.security.SecurityService
-import it.posteitaliane.gdc.magazzino.view.forms.Mainform
-import java.text.SimpleDateFormat
+import it.posteitaliane.gdc.magazzino.view.forms.DcSelect
 import java.time.format.DateTimeFormatter
 import javax.annotation.security.PermitAll
 
@@ -114,7 +106,7 @@ class MainView(
             setSizeFull()
         }
 
-        val form = Mainform(storage=storage)
+        val form = DcSelect("DATACENTER", storage.findLocations())
         form.addChangeListener {
             Notification.show(form.value.map { it.code }.joinToString("."))
         }
