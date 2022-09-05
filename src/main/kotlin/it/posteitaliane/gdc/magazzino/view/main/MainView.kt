@@ -116,7 +116,7 @@ class MainView(
 
         val form = Mainform(storage=storage)
         form.addChangeListener {
-            Notification.show(form.selected.map { it.code }.joinToString("."))
+            Notification.show(form.value.map { it.code }.joinToString("."))
         }
         add( form )
         add(orders)

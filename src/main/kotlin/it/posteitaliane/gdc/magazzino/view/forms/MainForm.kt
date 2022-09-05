@@ -26,7 +26,9 @@ class Mainform(private val storage: StorageRepository) : HorizontalLayout(){
     private val allItems:Checkbox
     private val group:CheckboxGroup<Location>
 
-    var selected:List<Location> = listOf()
+    private var selected:List<Location> = listOf()
+
+    val value get() = selected
 
     init {
 
