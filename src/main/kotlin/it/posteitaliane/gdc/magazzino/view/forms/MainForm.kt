@@ -22,7 +22,6 @@ class Mainform(private val storage: StorageRepository) : HorizontalLayout(){
 
     private val items = storage.findLocations()
 
-    private val allLabel: Label
     private val allItems:Checkbox
     private val group:CheckboxGroup<Location>
 
@@ -36,13 +35,15 @@ class Mainform(private val storage: StorageRepository) : HorizontalLayout(){
         setId("line-1")
         makeBorder()
 
-        addClassNames(LumoUtility.JustifyContent.CENTER)
+        addClassNames(LumoUtility.JustifyContent.CENTER, LumoUtility.BorderRadius.LARGE)
 
-        allLabel = label("DATACENTER") {
-            addClassNames(LumoUtility.Display.BLOCK, "pv-label")
+        label("DATACENTER") {
+            addClassNames(LumoUtility.Display.BLOCK, LumoUtility.Padding.Left.SMALL, "pv-label")
         }
 
-        allItems = checkBox()
+        allItems = checkBox() {
+            addClassNames(LumoUtility.Display.BLOCK, LumoUtility.Padding.Left.XSMALL)
+        }
 
         group = checkBoxGroup<Location> {
 
