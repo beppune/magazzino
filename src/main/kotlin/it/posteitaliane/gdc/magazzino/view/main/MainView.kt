@@ -3,8 +3,10 @@ package it.posteitaliane.gdc.magazzino.view.main
 import com.vaadin.flow.component.Unit
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.checkbox.Checkbox
+import com.vaadin.flow.component.checkbox.CheckboxGroup
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.H2
+import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.LitRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
@@ -18,6 +20,7 @@ import it.posteitaliane.gdc.magazzino.core.OrderSubject
 import it.posteitaliane.gdc.magazzino.core.OrderType
 import it.posteitaliane.gdc.magazzino.core.ports.StorageRepository
 import it.posteitaliane.gdc.magazzino.security.SecurityService
+import it.posteitaliane.gdc.magazzino.view.forms.Mainform
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import javax.annotation.security.PermitAll
@@ -111,6 +114,11 @@ class MainView(
             setSizeFull()
         }
 
+        val form = Mainform(storage=storage)
+        form.addChangeListener {
+            Notification.show(form.selected.map { it.code }.joinToString("."))
+        }
+        add( form )
         add(orders)
 
     }
