@@ -1,0 +1,11 @@
+/* Import your application global css files here or add the styles directly to this file */
+
+.pv-checkbox {
+    padding-top: 5px;
+    padding-bottom: 4px;
+}
+
+.pv-label {
+    padding-top: 6px;
+    padding-bottom: 4px;
+}
