@@ -111,6 +111,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
                     rep = it["receipient"] as String?
 
                     filepath = it["filepath"] as String?
+                    id = it["docid"] as String?
                 }
 
                 order

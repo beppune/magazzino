@@ -1,5 +1,6 @@
 package it.posteitaliane.gdc.magazzino.view.main
 
+import com.github.mvysny.karibudsl.v10.textArea
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.H2
@@ -32,12 +33,9 @@ class MainView(
 
     private var filter:((Order)->Boolean)? = null
 
-    private var dcs = listOf<Location>()
-
     init {
-        setSizeFull()
 
-        dcs = storage.findLocations()
+        setSizeFull()
 
         add(H2("Hello Vaadin"), logoutButton)
 
@@ -48,6 +46,8 @@ class MainView(
             addColumn("uid" ).apply {
                 setHeader("OPERATORE")
             }
+
+            addColumn("id").setHeader("DOCID")
 
             addColumn( LitRenderer
                 .of<Order?>("\${item.d}")
@@ -67,12 +67,13 @@ class MainView(
                 .of<Order?>("\${item.dcname}")
                 .withProperty("dcname") {
 
-                    val l = dcs.filter { dc ->
-                        dc.name == it.location
-                    }
-                    l[0].name
+                    storage.findLocations().find {
+                        dc -> dc.name == it.location
+                    }?.altname ?: it.location
                 }
             ).setHeader("MAGAZZINO")
+
+            //addColumn("location").setHeader("MAGAZZINO")
 
             addColumn(
                 LitRenderer
@@ -108,7 +109,6 @@ class MainView(
             setSizeFull()
         }
 
-        add(DcSelect("DC", storage.findLocations()))
         add(orders)
 
     }
