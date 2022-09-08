@@ -13,7 +13,9 @@ import it.posteitaliane.gdc.magazzino.core.Order
 import it.posteitaliane.gdc.magazzino.core.OrderSubject
 import it.posteitaliane.gdc.magazzino.core.OrderType
 import it.posteitaliane.gdc.magazzino.security.SecurityService
+import it.posteitaliane.gdc.magazzino.view.forms.DatePeriod
 import it.posteitaliane.gdc.magazzino.view.forms.DcSelect
+import it.posteitaliane.gdc.magazzino.view.forms.OrderForm
 import java.time.format.DateTimeFormatter
 import javax.annotation.security.PermitAll
 
@@ -106,11 +108,7 @@ class MainView(
             setSizeFull()
         }
 
-        val form = DcSelect("DATACENTER", storage.findLocations())
-        form.addChangeListener {
-            Notification.show(form.value.map { it.code }.joinToString("."))
-        }
-        add( form )
+        add(DcSelect("DC", storage.findLocations()))
         add(orders)
 
     }
