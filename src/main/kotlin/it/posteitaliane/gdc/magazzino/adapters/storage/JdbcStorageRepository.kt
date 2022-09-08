@@ -33,6 +33,8 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
                 "FROM datacenters " +
                 "JOIN BILLS_CODES ON (Abbreviazione = BILLS_CODES.DCCODE) " +
                 "JOIN DCALTNAMES ON (Abbreviazione = DCALTNAMES.DCCODE)"
+        const val OPERATOR_QUERY = "SELECT UserID AS uid, CONCAT(Cognome,\" \", Nome) AS name, Email AS email," +
+                "AreaAppartenenza AS area, Permesso AS permission FROM utenti WHERE UserID LIKE ?"
     }
 
     private val Rollback = MagazzinoApi(template)
@@ -182,6 +184,19 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
     }
 
     override fun findByUid(uid: String): Operator {
-        return Operator(uid,Area("", listOf()), Permission.READ)
+        return template.queryForList(OPERATOR_QUERY, uid)
+            .map {
+                val locations = findLocations(area=it["area"] as String)
+
+                Operator(
+                    it["uid"] as String,
+                    Area(it["area"] as String, locations),
+                    when(it["permission"] as String ) {
+                        "AMMINISTRATORE" -> Permission.ADMIN
+                        "SCRITTURA" -> Permission.WRITE
+                        else -> Permission.READ
+                    }
+                )
+            }.last()
     }
 }
