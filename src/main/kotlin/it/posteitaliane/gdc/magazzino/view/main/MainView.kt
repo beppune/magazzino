@@ -9,10 +9,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.LitRenderer
 import com.vaadin.flow.router.Route
 import it.posteitaliane.gdc.magazzino.adapters.storage.JdbcStorageRepository
-import it.posteitaliane.gdc.magazzino.core.Location
-import it.posteitaliane.gdc.magazzino.core.Order
-import it.posteitaliane.gdc.magazzino.core.OrderSubject
-import it.posteitaliane.gdc.magazzino.core.OrderType
+import it.posteitaliane.gdc.magazzino.core.*
 import it.posteitaliane.gdc.magazzino.security.SecurityService
 import it.posteitaliane.gdc.magazzino.view.forms.DatePeriod
 import it.posteitaliane.gdc.magazzino.view.forms.DcSelect
@@ -109,6 +106,11 @@ class MainView(
             setSizeFull()
         }
 
+        val period = DatePeriod("DATA ORDINE")
+        period.addValueChangeListener {
+            Notification.show(it.value.toString())
+        }
+        add(period)
         add(orders)
 
     }
