@@ -1,6 +1,5 @@
 package it.posteitaliane.gdc.magazzino.view.main
 
-import com.github.mvysny.karibudsl.v10.textArea
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.H2
@@ -11,9 +10,8 @@ import com.vaadin.flow.router.Route
 import it.posteitaliane.gdc.magazzino.adapters.storage.JdbcStorageRepository
 import it.posteitaliane.gdc.magazzino.core.*
 import it.posteitaliane.gdc.magazzino.security.SecurityService
-import it.posteitaliane.gdc.magazzino.view.forms.DatePeriod
+import it.posteitaliane.gdc.magazzino.view.forms.DateRangeField
 import it.posteitaliane.gdc.magazzino.view.forms.DcSelect
-import it.posteitaliane.gdc.magazzino.view.forms.OrderForm
 import java.time.format.DateTimeFormatter
 import javax.annotation.security.PermitAll
 
@@ -106,11 +104,16 @@ class MainView(
             setSizeFull()
         }
 
-        val period = DatePeriod("DATA ORDINE")
+        val period = DateRangeField("DATA ORDINE")
         period.addValueChangeListener {
             Notification.show(it.value.toString())
         }
-        add(period)
+
+        val dcselect = DcSelect("DC", storage.findLocations("ROMA"))
+        dcselect.addValueChangeListener {
+            it.value
+        }
+        add(period, dcselect)
         add(orders)
 
     }

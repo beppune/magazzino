@@ -2,13 +2,11 @@ package it.posteitaliane.gdc.magazzino.view.forms
 
 import com.vaadin.flow.component.customfield.CustomField
 import com.vaadin.flow.component.datepicker.DatePicker
-import com.vaadin.flow.component.html.Label
-import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.theme.lumo.LumoUtility
 import it.posteitaliane.gdc.magazzino.Utils
 import java.time.LocalDate
 
-class DatePeriod(label:String?=null) : CustomField<Pair<LocalDate?,LocalDate?>>() {
+class DateRangeField(label:String?=null) : CustomField<Pair<LocalDate?,LocalDate?>>() {
 
     private val from = DatePicker()
     private val to = DatePicker()
@@ -19,7 +17,6 @@ class DatePeriod(label:String?=null) : CustomField<Pair<LocalDate?,LocalDate?>>(
         from.apply {
             i18n = Utils.dateI18nIta
             placeholder = "DAL"
-
 
             addClassNames(LumoUtility.Margin.Right.MEDIUM)
         }
@@ -32,6 +29,12 @@ class DatePeriod(label:String?=null) : CustomField<Pair<LocalDate?,LocalDate?>>(
         from.addValueChangeListener {
             if(it.value != null) {
                 to.min = it.value
+            }
+        }
+
+        to.addValueChangeListener {
+            if(it.value != null) {
+                from.max = it.value
             }
         }
 
