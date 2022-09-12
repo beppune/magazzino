@@ -1,4 +1,4 @@
-package it.posteitaliane.gdc.magazzino.view.forms
+package it.posteitaliane.gdc.magazzino.view.forms.fields
 
 import com.vaadin.flow.component.customfield.CustomField
 import com.vaadin.flow.component.datepicker.DatePicker

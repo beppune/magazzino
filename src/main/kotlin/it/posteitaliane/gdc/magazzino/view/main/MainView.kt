@@ -10,8 +10,9 @@ import com.vaadin.flow.router.Route
 import it.posteitaliane.gdc.magazzino.adapters.storage.JdbcStorageRepository
 import it.posteitaliane.gdc.magazzino.core.*
 import it.posteitaliane.gdc.magazzino.security.SecurityService
-import it.posteitaliane.gdc.magazzino.view.forms.DateRangeField
-import it.posteitaliane.gdc.magazzino.view.forms.DcSelect
+import it.posteitaliane.gdc.magazzino.view.forms.OrderForm
+import it.posteitaliane.gdc.magazzino.view.forms.fields.DateRangeField
+import it.posteitaliane.gdc.magazzino.view.forms.fields.DcSelect
 import java.time.format.DateTimeFormatter
 import javax.annotation.security.PermitAll
 
@@ -113,7 +114,8 @@ class MainView(
         dcselect.addValueChangeListener {
             Notification.show(dcselect.value.map(Location::altname).toString())
         }
-        add(period, dcselect)
+        //add(period, dcselect)
+        add(OrderForm())
         add(orders)
 
     }

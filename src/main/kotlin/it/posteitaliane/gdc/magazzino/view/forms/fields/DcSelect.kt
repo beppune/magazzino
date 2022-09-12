@@ -1,4 +1,4 @@
-package it.posteitaliane.gdc.magazzino.view.forms
+package it.posteitaliane.gdc.magazzino.view.forms.fields
 
 import com.github.mvysny.karibudsl.v10.*
 import com.vaadin.flow.component.ComponentEvent
@@ -10,7 +10,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.shared.Registration
 import com.vaadin.flow.theme.lumo.LumoUtility
 import it.posteitaliane.gdc.magazzino.core.Location
-import it.posteitaliane.gdc.magazzino.core.ports.StorageRepository
 
 private fun HasStyle.makeBorder() : Unit {
     addClassNames(LumoUtility.Border.ALL, LumoUtility.BorderColor.CONTRAST_90)
@@ -71,6 +70,6 @@ class DcSelect(private val items:List<Location>) : HorizontalLayout(){
         return addListener(DcselecthangeEvent::class.java, listener)
     }
 
-    class DcselecthangeEvent(source:DcSelect, fromClient:Boolean=false) : ComponentEvent<DcSelect>(source, fromClient)
+    class DcselecthangeEvent(source: DcSelect, fromClient:Boolean=false) : ComponentEvent<DcSelect>(source, fromClient)
 
 }
