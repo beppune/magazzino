@@ -4,6 +4,7 @@ import com.github.mvysny.karibudsl.v10.*
 import com.vaadin.flow.component.Unit
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
+import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.Binder
@@ -38,7 +39,14 @@ class OrderForm() : FormLayout(){
             maxLength = 50
         }
 
-        upLoadField = FileUpload().apply { this@OrderForm.add(this) }
+        upLoadField = FileUpload()
+            .apply {
+                this@OrderForm.add(this)
+
+                addValueChangeListener {
+                    Notification.show(it.value.toString())
+                }
+            }
 
         remarksField = textArea {
             placeholder = "max 500 caratteri"

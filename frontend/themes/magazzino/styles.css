@@ -23,3 +23,7 @@
 ul[part='file-list'] {
     display: none;
 }
+
+.hidden {
+    visibility: hidden;
+}
