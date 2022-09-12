@@ -1,61 +1,52 @@
 package it.posteitaliane.gdc.magazzino.view.forms
 
 import com.github.mvysny.karibudsl.v10.*
-import com.github.mvysny.kaributools.placeholder
 import com.vaadin.flow.component.Unit
-import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
-import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
-import com.vaadin.flow.component.upload.UploadI18N
 import com.vaadin.flow.data.binder.Binder
-import com.vaadin.flow.data.binder.ValidationException
-import com.vaadin.flow.data.validator.StringLengthValidator
 import com.vaadin.flow.theme.lumo.LumoUtility
+import it.posteitaliane.gdc.magazzino.Utils
 import it.posteitaliane.gdc.magazzino.core.*
-import it.posteitaliane.gdc.magazzino.core.ports.StorageRepository
+import java.time.LocalDate
 
-class OrderForm(var order:MutableOrder) : FormLayout(){
+class OrderForm() : FormLayout(){
 
-    val binder = Binder(MutableOrder::class.java)
-
-    val repField:ComboBox<String>
-
-    val saveButton:Button
+    private val refField: TextField
+    private val projectField: TextField
+    private val dateField: DatePicker
+    private val remarksField: TextArea
 
     init {
-        binder.readBean(order)
-
-        repField = comboBox {
-            setItems( "ONE", "TWO", "THREE" )
-            isAllowCustomValue = true
-            placeholder = "REFERENTE"
-
-            binder.forField(this)
-                .asRequired("Campo Obbligatorio")
-                .bind("rep")
-
+        refField = textField {
+            placeholder = "REFERENTE (max 30 caratteri)"
+            maxLength = 30
         }
 
-        saveButton = Button("Save") {
-
-            try {
-                binder.writeBean(order)
-                Notification.show(order.rep)
-            } catch (ex:ValidationException) {
-
-            }
-
+        dateField = datePicker {
+            placeholder = "DATA ORDINE"
+            i18n = Utils.dateI18nIta
+            max = LocalDate.now()
         }
 
-        add(
-            repField,
-            saveButton
-        )
+        projectField = textField {
+            placeholder = "PROGETTO (max 50 caratteri)"
+            maxLength = 50
+        }
 
-        setColspan(repField, 2)
+        textField {
+            isReadOnly = true
+            value = "FILE UPLOAD"
+        }
 
+        remarksField = textArea {
+            placeholder = "max 500 caratteri"
+        }
+
+        setColspan(remarksField, 2)
+
+        setWidth(50f, Unit.PERCENTAGE)
     }
-
 }
