@@ -109,9 +109,9 @@ class MainView(
             Notification.show(it.value.toString())
         }
 
-        val dcselect = DcSelect("DC", storage.findLocations("ROMA"))
+        val dcselect = DcSelect(storage.findLocations())
         dcselect.addValueChangeListener {
-            it.value
+            Notification.show(dcselect.value.map(Location::altname).toString())
         }
         add(period, dcselect)
         add(orders)
