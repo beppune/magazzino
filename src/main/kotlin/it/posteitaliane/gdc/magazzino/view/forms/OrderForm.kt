@@ -10,6 +10,7 @@ import com.vaadin.flow.data.binder.Binder
 import com.vaadin.flow.theme.lumo.LumoUtility
 import it.posteitaliane.gdc.magazzino.Utils
 import it.posteitaliane.gdc.magazzino.core.*
+import it.posteitaliane.gdc.magazzino.view.forms.fields.FileUpload
 import java.time.LocalDate
 
 class OrderForm() : FormLayout(){
@@ -17,6 +18,7 @@ class OrderForm() : FormLayout(){
     private val refField: TextField
     private val projectField: TextField
     private val dateField: DatePicker
+    private val upLoadField: FileUpload
     private val remarksField: TextArea
 
     init {
@@ -36,10 +38,7 @@ class OrderForm() : FormLayout(){
             maxLength = 50
         }
 
-        textField {
-            isReadOnly = true
-            value = "FILE UPLOAD"
-        }
+        upLoadField = FileUpload().apply { this@OrderForm.add(this) }
 
         remarksField = textArea {
             placeholder = "max 500 caratteri"
