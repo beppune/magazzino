@@ -12,7 +12,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility
 import it.posteitaliane.gdc.magazzino.core.Location
 import it.posteitaliane.gdc.magazzino.core.ports.StorageRepository
 
-fun HasStyle.makeBorder() : Unit {
+private fun HasStyle.makeBorder() : Unit {
     addClassNames(LumoUtility.Border.ALL, LumoUtility.BorderColor.CONTRAST_90)
 }
 
