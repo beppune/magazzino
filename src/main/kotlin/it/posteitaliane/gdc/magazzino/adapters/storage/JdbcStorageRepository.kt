@@ -35,6 +35,8 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
                 "JOIN DCALTNAMES ON (Abbreviazione = DCALTNAMES.DCCODE)"
         const val OPERATOR_QUERY = "SELECT UserID AS uid, CONCAT(Cognome,\" \", Nome) AS name, Email AS email," +
                 "AreaAppartenenza AS area, Permesso AS permission FROM utenti WHERE UserID LIKE ?"
+
+        const val UUSERS_QUERY = "SELECT UserID AS uid, Nome AS firstName, Cognome AS secondName, Email AS email FROM utenti"
     }
 
     private val Rollback = MagazzinoApi(template)
@@ -122,6 +124,18 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
                 order
             }
             .toList()
+    }
+
+    override fun findUsers(): List<User> {
+        return template.queryForList(UUSERS_QUERY)
+            .map {
+                User(
+                    it["uid"] as String,
+                    it["firstName"] as String,
+                    it["secondName"] as String,
+                    it["email"] as String
+                )
+            }
     }
 
     override fun positionsAt(location: String): List<String> {
