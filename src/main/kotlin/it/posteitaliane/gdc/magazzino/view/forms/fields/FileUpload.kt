@@ -15,82 +15,69 @@ import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.component.upload.UploadI18N
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer
 import com.vaadin.flow.theme.lumo.LumoUtility
+import java.time.LocalDate
+import java.time.LocalTime
 import kotlin.system.measureTimeMillis
 
-class FileUpload : CustomField<Pair<String?,Boolean>>(){
+typealias FileValue = Pair<String?,Boolean>
 
-    private var isOnlyScan: Boolean = false
-    private var fileName: String? = null
-    private val addButton: Button
-    private val removeButton: Button
-    private val onlyScan: Checkbox
+class FileUpload : CustomField<FileValue>(){
+
+    private val addButton:Button
+    private val removeButton:Button
+    private val onlyScan:Checkbox
+
     private val upload:Upload
 
+    private var fileName:String?=null
+
     init {
+        addClassNames(LumoUtility.Padding.Vertical.XSMALL)
+
+        addButton = Button("Carica PDF").apply {
+            setWidth(50f, Unit.PERCENTAGE)
+        }
+        removeButton = Button("Rimuovi").apply {
+            addThemeVariants(ButtonVariant.LUMO_ERROR)
+
+            setWidth(50f, Unit.PERCENTAGE)
+            isVisible = false
+        }
+        onlyScan = Checkbox("Solo Scansione")
 
         upload = Upload(MemoryBuffer()).apply {
-            isDropAllowed = false
-            //setAcceptedFileTypes("application/pdf")
-            addClassNames("hidden")
+            addClassNames(LumoUtility.Display.HIDDEN)
+            addSucceededListener {
+                fileName = it.fileName
+                removeButton.text = fileName
+                removeButton.isVisible = true
+                addButton.isVisible = false
+
+                this@FileUpload.updateValue()
+            }
         }
-
-        addButton = Button("Upload PDF...")
-            .apply {
-                setWidth(15f, Unit.REM)
-            }
-
-        removeButton = Button("Rimuovi")
-            .apply {
-                addThemeVariants(ButtonVariant.LUMO_ERROR)
-                setWidth(15f, Unit.REM)
-                isVisible = false
-            }
-
-        onlyScan = Checkbox("Solo Scansione")
-            .apply {
-                addClassNames(
-                    LumoUtility.Display.FLEX,
-                    LumoUtility.AlignItems.CENTER
-                )
-            }
 
         addButton.addClickListener {
             upload.getElement().callJsFunction("shadowRoot.getElementById('addFiles').click")
         }
 
-        upload.addSucceededListener {
-
-            fileName = it.fileName
-
-            setPresentationValue(Pair(it.fileName,onlyScan.value))
-        }
-
         removeButton.addClickListener {
-            fileName = null
-
-            setPresentationValue(Pair(null,onlyScan.value))
-        }
-
-        add(
-            HorizontalLayout(upload,addButton,removeButton, onlyScan).apply {
-                addClassNames(LumoUtility.Padding.NONE)
-            }
-        )
-    }
-
-    override fun setPresentationValue(value: Pair<String?,Boolean>) {
-        if(value.first != null) {
-            addButton.isVisible = false
-            removeButton.isVisible = true
-            removeButton.text = value.first
-        } else {
             upload.clearFileList()
-            addButton.isVisible = true
+            removeButton.text = null
             removeButton.isVisible = false
+            addButton.isVisible = true
+            updateValue()
         }
+
+        add(addButton, removeButton, onlyScan, upload)
+    }
+    override fun setPresentationValue(fv: FileValue?) {
+        onlyScan.value = fv?.second
     }
 
-    override fun generateModelValue(): Pair<String?,Boolean> {
-        return Pair(fileName,isOnlyScan)
+    override fun generateModelValue(): FileValue {
+        return Pair(removeButton.text, onlyScan.value)
     }
+
+
 }
