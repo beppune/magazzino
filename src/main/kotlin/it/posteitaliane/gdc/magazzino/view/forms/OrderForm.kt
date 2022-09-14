@@ -1,7 +1,9 @@
 package it.posteitaliane.gdc.magazzino.view.forms
 
 import com.github.mvysny.karibudsl.v10.*
+import com.vaadin.flow.component.HasEnabled
 import com.vaadin.flow.component.Unit
+import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
@@ -25,6 +27,8 @@ class OrderForm(users:List<User>) : FormLayout(){
     private val upLoadField: FileUpload
     private val remarksField: TextArea
 
+    private val binder:Binder<MutableOrder> = Binder(MutableOrder::class.java)
+
     init {
         repField = comboBox {
             placeholder = "REFERENTE (max 30 caratteri)"
@@ -37,6 +41,7 @@ class OrderForm(users:List<User>) : FormLayout(){
             }
 
             isRequired = true
+            isRequiredIndicatorVisible = true
         }
 
         dateField = datePicker {
@@ -76,5 +81,9 @@ class OrderForm(users:List<User>) : FormLayout(){
         setColspan(remarksField, 2)
 
         setWidth(50f, Unit.PERCENTAGE)
+
+        binder.forField(repField)
+            .asRequired("CAMPO OBBLIGATORIO")
+            .bind("rep")
     }
 }
