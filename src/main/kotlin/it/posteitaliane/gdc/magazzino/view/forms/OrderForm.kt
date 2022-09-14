@@ -35,6 +35,8 @@ class OrderForm(users:List<User>) : FormLayout(){
             addCustomValueSetListener {
                 value = it.detail.take(30).uppercase()
             }
+
+            isRequired = true
         }
 
         dateField = datePicker {
