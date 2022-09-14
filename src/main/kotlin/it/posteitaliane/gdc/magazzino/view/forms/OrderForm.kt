@@ -6,6 +6,7 @@ import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.textfield.Autocapitalize
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.Binder
@@ -45,6 +46,10 @@ class OrderForm(users:List<User>) : FormLayout(){
         projectField = textField {
             placeholder = "PROGETTO (max 50 caratteri)"
             maxLength = 50
+
+            addBlurListener{
+                value = value?.uppercase()
+            }
         }
 
         upLoadField = FileUpload()
@@ -59,6 +64,11 @@ class OrderForm(users:List<User>) : FormLayout(){
         remarksField = textArea {
             placeholder = "max 500 caratteri"
             maxLength = 500
+
+
+            addBlurListener{
+                value = value?.uppercase()
+            }
         }
 
         setColspan(remarksField, 2)
