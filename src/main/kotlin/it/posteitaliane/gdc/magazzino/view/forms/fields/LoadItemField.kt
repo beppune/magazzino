@@ -4,10 +4,9 @@ import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.customfield.CustomField
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.component.textfield.IntegerField
-import com.vaadin.flow.component.textfield.NumberField
 import com.vaadin.flow.component.textfield.TextField
+import it.posteitaliane.gdc.magazzino.core.MutableOrder
 import it.posteitaliane.gdc.magazzino.core.OrderLine
-import kotlin.math.max
 
 class LoadItemField(items:List<String>, positions:List<String>) : CustomField<OrderLine>(){
 
@@ -67,12 +66,26 @@ class LoadItemField(items:List<String>, positions:List<String>) : CustomField<Or
     }
 
 
-    override fun setPresentationValue(value: OrderLine?) {
-        TODO("Not yet implemented")
+    override fun setPresentationValue(line: OrderLine?) {
+        if( line != null ) {
+            itemField.value = line.item
+            posField.value = line.position
+            amountField.value = if( line.isTracked() )  1 else line.amount
+
+            snField.value = line.sn
+            ptField.value = line.pt
+        }
     }
 
     override fun generateModelValue(): OrderLine {
-        TODO("Not yet implemented")
+        return OrderLine(
+            item = itemField.value,
+            position = posField.value,
+            amount = amountField.value,
+
+            sn = snField.value,
+            pt = ptField.value
+        )
     }
 
 
