@@ -17,6 +17,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility
 import it.posteitaliane.gdc.magazzino.Utils
 import it.posteitaliane.gdc.magazzino.core.*
 import it.posteitaliane.gdc.magazzino.view.forms.fields.FileUpload
+import it.posteitaliane.gdc.magazzino.view.forms.fields.LoadItemField
 import java.time.LocalDate
 
 class OrderForm(users:List<User>) : FormLayout(){
@@ -76,6 +77,11 @@ class OrderForm(users:List<User>) : FormLayout(){
             addBlurListener{
                 value = value?.uppercase()
             }
+        }
+
+        LoadItemField(listOf("MERCE 1", "MERCE 2", "MERCE 3"), listOf("A1", "A2", "A3")).apply {
+            this@OrderForm.add(this)
+            this@OrderForm.setColspan(this, 2)
         }
 
         setColspan(remarksField, 2)
