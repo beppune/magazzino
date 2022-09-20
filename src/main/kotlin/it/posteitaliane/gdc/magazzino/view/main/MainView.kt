@@ -7,6 +7,7 @@ import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.LitRenderer
 import com.vaadin.flow.router.Route
+import com.vaadin.flow.theme.lumo.LumoUtility
 import it.posteitaliane.gdc.magazzino.adapters.storage.JdbcStorageRepository
 import it.posteitaliane.gdc.magazzino.core.*
 import it.posteitaliane.gdc.magazzino.security.SecurityService
@@ -28,6 +29,8 @@ class MainView(
     private val orders: Grid<Order> = Grid(Order::class.java)
 
     private var filter:((Order)->Boolean)? = null
+
+    private var form:OrderForm?=null
 
     init {
 
@@ -114,9 +117,8 @@ class MainView(
         dcselect.addValueChangeListener {
             Notification.show(dcselect.value.map(Location::altname).toString())
         }
-        //add(period, dcselect)
+
         add(OrderForm(storage.findUsers()))
-        add(orders)
 
     }
 
