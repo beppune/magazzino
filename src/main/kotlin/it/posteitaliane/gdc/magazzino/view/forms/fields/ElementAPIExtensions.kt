@@ -20,3 +20,14 @@ fun TextArea.uppercaseJs() {
 fun ComboBox<*>.uppercaseJs() {
     element.executeJs("this.childNodes.item(0).style['text-transform'] = 'Uppercase'")
 }
+
+fun TextField.allowOnlyDigitsJs() {
+    element.executeJs("""
+        const ALLOWED_CHARS_REGEXP = /[0-9]+/;
+        this.childNodes.item(0).addEventListener("keypress", event => {
+          if (!ALLOWED_CHARS_REGEXP.test(event.key)) {
+            event.preventDefault();
+          }
+        });
+    """.trimIndent())
+}

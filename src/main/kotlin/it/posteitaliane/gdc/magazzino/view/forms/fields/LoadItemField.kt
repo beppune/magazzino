@@ -8,8 +8,6 @@ import com.vaadin.flow.component.customfield.CustomField
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.component.textfield.IntegerField
 import com.vaadin.flow.component.textfield.TextField
-import it.posteitaliane.gdc.magazzino.core.MutableOrder
-import it.posteitaliane.gdc.magazzino.core.OrderLine
 
 class LoadItemField(items:List<String>, positions:List<String>) : CustomField<String>(){
 
@@ -64,7 +62,9 @@ class LoadItemField(items:List<String>, positions:List<String>) : CustomField<St
             maxLength = 8
             isRequired = false
 
-            pattern = "[0-9]*"
+            pattern = "[0-9]+"
+
+            allowOnlyDigitsJs()
         }
 
         actionButton = Button("Aggiungi Merce").apply {
