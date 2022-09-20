@@ -15,12 +15,11 @@ import it.posteitaliane.gdc.magazzino.Utils
 import it.posteitaliane.gdc.magazzino.core.*
 import it.posteitaliane.gdc.magazzino.view.forms.fields.FileUpload
 import it.posteitaliane.gdc.magazzino.view.forms.fields.LoadItemField
+import it.posteitaliane.gdc.magazzino.view.forms.fields.maxLengthJs
+import it.posteitaliane.gdc.magazzino.view.forms.fields.uppercaseJs
 import java.io.Serializable
 import java.time.LocalDate
 
-fun ComboBox<*>.maxLengthJs(max:Int) {
-    element.executeJs("this.childNodes.item(0).maxLength = ${max}")
-}
 
 class OrderForm(users:List<User>) : FormLayout(){
 
@@ -46,7 +45,7 @@ class OrderForm(users:List<User>) : FormLayout(){
             setItems(users.map { "${it.lastName} ${it.firstName}" })
 
             addCustomValueSetListener {
-                value = it.detail.take(30).uppercase()
+                value = it.detail.uppercase() // uppercaseJs only set style. value still depends on keyboard input
             }
 
             isRequired = true
@@ -54,6 +53,7 @@ class OrderForm(users:List<User>) : FormLayout(){
 
             maxLengthJs(30)
 
+            uppercaseJs()
         }
 
         dateField = datePicker {
@@ -69,6 +69,8 @@ class OrderForm(users:List<User>) : FormLayout(){
             addBlurListener{
                 value = value?.uppercase()
             }
+
+            uppercaseJs()
         }
 
         upLoadField = FileUpload()
@@ -84,10 +86,11 @@ class OrderForm(users:List<User>) : FormLayout(){
             placeholder = "max 500 caratteri"
             maxLength = 500
 
-
             addBlurListener{
                 value = value?.uppercase()
             }
+
+            uppercaseJs()
         }
 
         setColspan(remarksField, 2)
