@@ -92,6 +92,10 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
                 altname = it["altname"] as String,
                 billcode = it["billcode"] as String
             )
+        }.map {
+            val pos = template.queryForList(POSITIONS_QUERY, String::class.java, it.name)
+            it.positions.addAll(pos)
+            it
         }
     }
 
@@ -101,7 +105,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
                 val op = findByUid(it["user"] as String)
 
                 val order = MutableOrder(op, it["opdate"] as LocalDateTime,
-                    it["dc"] as String,
+                    findLocations().find { loc -> it["dccode"] == loc.code } as Location,
                     when(it["op"]) { "CARICO" -> OrderType.LOAD else -> OrderType.UNLOAD },
                     when(it["DOCSUBJECT"]) { "INTERNAL" -> OrderSubject.INTERNAL else -> OrderSubject.PARTNER })
 
@@ -149,7 +153,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
     }
 
     override fun registerLoad(order: Order, item: String, position: String, amount: Int) {
-        val(stato, mess) = Load(order.uid, order.id, order.location, position, item, amount,
+        val(stato, mess) = Load(order.uid, order.id, order.location.name, position, item, amount,
             null, null, null, null, null, null, null)
     }
 
@@ -165,7 +169,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
 
         }
 
-        val(stato, mess, docid) = Call(uid=o.uid, o.location, o.rep, "FITTIZIA", null, o.remarks)
+        val(stato, mess, docid) = Call(uid=o.uid, o.location.name, o.rep, "FITTIZIA", null, o.remarks)
 
         if(stato!=0) {
             Rollback(uid = o.uid)
@@ -177,7 +181,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
         run loop@ {
             o.lines.forEach {
                 var (stato2, mess2) = Load(
-                    uid = it.order.uid, it.order.id, it.order.location, it.position, it.item, it.amount,
+                    uid = it.order.uid, it.order.id, it.order.location.name, it.position, it.item, it.amount,
                     null, it.sn, null, null, null, null, it.pt
                 )
 
@@ -188,7 +192,7 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
             }
         }
 
-        Commit(uid = order.uid, order.location)
+        Commit(uid = order.uid, order.location.name)
     }
 
     override fun snExists(sn: String?): Boolean {

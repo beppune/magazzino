@@ -11,10 +11,12 @@ import com.vaadin.flow.server.auth.AnonymousAllowed
 import com.vaadin.flow.theme.lumo.LumoUtility
 import it.posteitaliane.gdc.magazzino.adapters.storage.JdbcStorageRepository
 import it.posteitaliane.gdc.magazzino.core.*
+import it.posteitaliane.gdc.magazzino.core.services.FrontOffice
 import it.posteitaliane.gdc.magazzino.security.SecurityService
 import it.posteitaliane.gdc.magazzino.view.forms.OrderForm
 import it.posteitaliane.gdc.magazzino.view.forms.fields.DateRangeField
 import it.posteitaliane.gdc.magazzino.view.forms.fields.DcSelect
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.annotation.security.PermitAll
 
@@ -23,7 +25,8 @@ import javax.annotation.security.PermitAll
 @AnonymousAllowed
 class MainView(
     private val security: SecurityService,
-    private val storage: JdbcStorageRepository
+    private val storage: JdbcStorageRepository,
+    private val office: FrontOffice
 ) : VerticalLayout() {
 
     private val logoutButton = Button("Logout") { security.logout() }
@@ -69,7 +72,7 @@ class MainView(
                 .withProperty("dcname") {
 
                     storage.findLocations().find {
-                        dc -> dc.name == it.location
+                        dc -> dc.name == it.location.name
                     }?.altname ?: it.location
                 }
             ).setHeader("MAGAZZINO")
@@ -120,7 +123,15 @@ class MainView(
             Notification.show(dcselect.value.map(Location::altname).toString())
         }
 
-        add(OrderForm(storage.findUsers()))
+        val order = MutableOrder(
+            Operator("MANZOGI9", Area("TORINO", storage.findLocations("TORINO")), Permission.WRITE),
+            LocalDateTime.now(),
+            storage.findLocations().find { it.code == "TOR" } as Location,
+            OrderType.LOAD,
+            OrderSubject.INTERNAL
+        )
+
+        add(OrderForm(storage.findUsers(), order))
 
     }
 

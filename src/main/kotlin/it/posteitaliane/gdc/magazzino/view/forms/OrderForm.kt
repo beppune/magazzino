@@ -14,6 +14,7 @@ import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.data.binder.Binder
 import com.vaadin.flow.theme.lumo.LumoUtility
 import it.posteitaliane.gdc.magazzino.Utils
 import it.posteitaliane.gdc.magazzino.core.*
@@ -23,9 +24,11 @@ import it.posteitaliane.gdc.magazzino.view.forms.fields.maxLengthJs
 import it.posteitaliane.gdc.magazzino.view.forms.fields.uppercaseJs
 import java.io.Serializable
 import java.time.LocalDate
+import kotlin.reflect.jvm.javaGetter
+import kotlin.reflect.jvm.javaSetter
 
 
-class OrderForm(users:List<User>) : FormLayout(), HasOrderedComponents{
+class OrderForm(users:List<User>, val order: MutableOrder) : FormLayout(), HasOrderedComponents{
 
     private val repField: ComboBox<String>
     private val projectField: TextField
@@ -43,6 +46,8 @@ class OrderForm(users:List<User>) : FormLayout(), HasOrderedComponents{
     private val phonyItem:HorizontalLayout
 
     private val itemFields:MutableList<HorizontalLayout> = mutableListOf()
+
+    private val binder:Binder<MutableOrder>
 
     init {
 
@@ -111,7 +116,7 @@ class OrderForm(users:List<User>) : FormLayout(), HasOrderedComponents{
             val button = Button("Aggiungi").apply {
                 addThemeVariants(ButtonVariant.LUMO_SMALL)
                 addClickListener {
-                    addRecord(LoadItemField(listOf("MERCE 1 ", "MERCE 2"), listOf("P1", "P2")))
+                    addRecord(LoadItemField(listOf("MERCE 1 ", "MERCE 2"), order.location.positions))
                 }
             }
 
@@ -130,7 +135,7 @@ class OrderForm(users:List<User>) : FormLayout(), HasOrderedComponents{
 
                 addComponentAtIndex(indexOf(formButtons), phonyItem)
                 setColspan(phonyItem, 2)
-                addRecord(LoadItemField(listOf("MERCE 1 ", "MERCE 2"), listOf("P1", "P2")))
+                addRecord(LoadItemField(listOf("MERCE 1 ", "MERCE 2"), order.location.positions ))
             } else {
                 Notification.show("Scan Only. Register Order")
             }
@@ -169,6 +174,26 @@ class OrderForm(users:List<User>) : FormLayout(), HasOrderedComponents{
                 itemFields.forEach({it.isEnabled = true})
             }
         }
+
+        // BINDER
+        binder = Binder(MutableOrder::class.java)
+
+        binder.forField(repField)
+            .asRequired("Richiesto")
+            .withValidator({ rep -> rep.length <= 30 }, "Massimo 30 caratteri")
+            .bind("rep")
+
+        add(Button("Valida").apply {
+            addClickListener {
+                binder.validate()
+            }
+        })
+
+        add(Button("Reset").apply {
+            addClickListener {
+                binder.readBean(null)
+            }
+        })
     }
 
     private fun addRecord(lineField: LoadItemField) {

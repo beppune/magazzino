@@ -24,7 +24,7 @@ class LoadItemField(items:List<String>, positions:List<String>) : CustomField<St
         itemField = ComboBox<String>().apply {
 
             setItems(items)
-            placeholder = LocalTime.now().nano.toString().take(4)
+            placeholder = "MERCE"
 
             isRequired = true
             isRequiredIndicatorVisible = true
