@@ -70,6 +70,8 @@ class FileUpload : CustomField<FileValue>(){
         }
 
         add(addButton, removeButton, onlyScan, upload)
+
+        value = Pair(null, false)
     }
     override fun setPresentationValue(fv: FileValue?) {
         onlyScan.value = fv?.second

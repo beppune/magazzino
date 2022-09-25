@@ -8,6 +8,7 @@ import com.vaadin.flow.component.customfield.CustomField
 import com.vaadin.flow.component.select.Select
 import com.vaadin.flow.component.textfield.IntegerField
 import com.vaadin.flow.component.textfield.TextField
+import java.time.LocalTime
 
 class LoadItemField(items:List<String>, positions:List<String>) : CustomField<String>(){
 
@@ -18,13 +19,12 @@ class LoadItemField(items:List<String>, positions:List<String>) : CustomField<St
     private val snField:TextField
     private val ptField:TextField
 
-    private val actionButton:Button
     init {
 
         itemField = ComboBox<String>().apply {
 
             setItems(items)
-            placeholder = "MERCE"
+            placeholder = LocalTime.now().nano.toString().take(4)
 
             isRequired = true
             isRequiredIndicatorVisible = true
@@ -67,11 +67,7 @@ class LoadItemField(items:List<String>, positions:List<String>) : CustomField<St
             allowOnlyDigitsJs()
         }
 
-        actionButton = Button("Aggiungi Merce").apply {
-            addThemeVariants(ButtonVariant.LUMO_SMALL)
-        }
-
-        add(itemField, posField, amountField, snField, ptField, actionButton)
+        add(itemField, posField, amountField, snField, ptField)
     }
 
 

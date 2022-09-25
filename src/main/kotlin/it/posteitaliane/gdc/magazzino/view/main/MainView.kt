@@ -7,6 +7,7 @@ import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.LitRenderer
 import com.vaadin.flow.router.Route
+import com.vaadin.flow.server.auth.AnonymousAllowed
 import com.vaadin.flow.theme.lumo.LumoUtility
 import it.posteitaliane.gdc.magazzino.adapters.storage.JdbcStorageRepository
 import it.posteitaliane.gdc.magazzino.core.*
@@ -19,6 +20,7 @@ import javax.annotation.security.PermitAll
 
 @Route
 @PermitAll
+@AnonymousAllowed
 class MainView(
     private val security: SecurityService,
     private val storage: JdbcStorageRepository

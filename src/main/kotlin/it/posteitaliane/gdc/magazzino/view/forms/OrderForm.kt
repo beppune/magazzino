@@ -1,11 +1,15 @@
 package it.posteitaliane.gdc.magazzino.view.forms
 
 import com.github.mvysny.karibudsl.v10.*
+import com.vaadin.flow.component.HasOrderedComponents
 import com.vaadin.flow.component.Unit
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
+import com.vaadin.flow.component.icon.Icon
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.textfield.TextArea
@@ -21,7 +25,7 @@ import java.io.Serializable
 import java.time.LocalDate
 
 
-class OrderForm(users:List<User>) : FormLayout(){
+class OrderForm(users:List<User>) : FormLayout(), HasOrderedComponents{
 
     private val repField: ComboBox<String>
     private val projectField: TextField
@@ -32,12 +36,16 @@ class OrderForm(users:List<User>) : FormLayout(){
     private val docForms: List<Serializable>
 
     private var nextButton:Button
-    private var importButton:Button
     private var prevButton:Button
 
     private val formButtons:HorizontalLayout
 
+    private val phonyItem:HorizontalLayout
+
+    private val itemFields:MutableList<HorizontalLayout> = mutableListOf()
+
     init {
+
         repField = comboBox {
             placeholder = "REFERENTE (max 30 caratteri)"
             isAllowCustomValue = true
@@ -76,10 +84,6 @@ class OrderForm(users:List<User>) : FormLayout(){
         upLoadField = FileUpload()
             .apply {
                 this@OrderForm.add(this)
-
-                addValueChangeListener {
-                    Notification.show(it.value.toString())
-                }
             }
 
         remarksField = textArea {
@@ -101,12 +105,52 @@ class OrderForm(users:List<User>) : FormLayout(){
             Form Buttons
         */
 
+        phonyItem = HorizontalLayout().apply {
+            val i = LoadItemField(listOf(), listOf())
+
+            val button = Button("Aggiungi").apply {
+                addThemeVariants(ButtonVariant.LUMO_SMALL)
+                addClickListener {
+                    addRecord(LoadItemField(listOf("MERCE 1 ", "MERCE 2"), listOf("P1", "P2")))
+                }
+            }
+
+            i.isEnabled = false
+
+            add(i, button)
+        }
+
         formButtons = HorizontalLayout()
         nextButton = Button("Inserisci Merci")
-        importButton = Button("Inserisci Merci da Excel").apply { addClassNames(LumoUtility.Margin.Right.AUTO) }
         prevButton = Button("Annulla")
 
-        formButtons.add(importButton, prevButton, nextButton)
+        nextButton.addClickListener {
+
+            if( !upLoadField.value.second ) {
+
+                addComponentAtIndex(indexOf(formButtons), phonyItem)
+                setColspan(phonyItem, 2)
+                addRecord(LoadItemField(listOf("MERCE 1 ", "MERCE 2"), listOf("P1", "P2")))
+            } else {
+                Notification.show("Scan Only. Register Order")
+            }
+        }
+
+        prevButton.addClickListener {
+            nextButton.isVisible = true
+
+            if(itemFields.isNotEmpty()) {
+
+                remove(phonyItem)
+
+                itemFields.forEach(::remove)
+                itemFields.clear()
+            } else {
+                Notification.show("Annulla Ordine")
+            }
+        }
+
+        formButtons.add(prevButton, nextButton)
         formButtons.addClassNames(LumoUtility.JustifyContent.END,
             LumoUtility.Border.ALL, LumoUtility.BorderColor.CONTRAST_90)
 
@@ -114,13 +158,32 @@ class OrderForm(users:List<User>) : FormLayout(){
         add(formButtons)
         setColspan(formButtons, 2)
 
-        var m1 = LoadItemField(listOf("MERCE 1", "MERCE 2", "MERCE 3"), listOf("A1", "A2", "A3"))
-
-        add(m1)
-
-        setColspan(m1, 2)
-
         setWidth(50f, Unit.PERCENTAGE)
 
+        upLoadField.addValueChangeListener {
+            if( it.value.second ) {
+                nextButton.text = "Registra Documento"
+                itemFields.forEach({it.isEnabled = false})
+            } else {
+                nextButton.text = "Inserisci Merci"
+                itemFields.forEach({it.isEnabled = true})
+            }
+        }
+    }
+
+    private fun addRecord(lineField: LoadItemField) {
+        val l = HorizontalLayout(lineField)
+
+        val b = Button("Rimuovi").apply {
+            addThemeVariants(ButtonVariant.LUMO_SMALL)
+            addClickListener {
+                this@OrderForm.remove(l)
+            }
+        }
+        l.add(lineField, b)
+
+        addComponentAtIndex(indexOf(phonyItem), l)
+        setColspan(l, 2)
+        itemFields.add(l)
     }
 }
