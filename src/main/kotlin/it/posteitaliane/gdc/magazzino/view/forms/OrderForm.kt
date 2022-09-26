@@ -28,7 +28,7 @@ import kotlin.reflect.jvm.javaGetter
 import kotlin.reflect.jvm.javaSetter
 
 
-class OrderForm(users:List<User>, val order: MutableOrder) : FormLayout(), HasOrderedComponents{
+class OrderForm(val order: MutableOrder, users:List<User>, items:List<String>) : FormLayout(), HasOrderedComponents{
 
     private val repField: ComboBox<String>
     private val projectField: TextField
@@ -116,7 +116,7 @@ class OrderForm(users:List<User>, val order: MutableOrder) : FormLayout(), HasOr
             val button = Button("Aggiungi").apply {
                 addThemeVariants(ButtonVariant.LUMO_SMALL)
                 addClickListener {
-                    addRecord(LoadItemField(listOf("MERCE 1 ", "MERCE 2"), order.location.positions))
+                    addRecord(LoadItemField(items, order.location.positions))
                 }
             }
 
@@ -135,7 +135,7 @@ class OrderForm(users:List<User>, val order: MutableOrder) : FormLayout(), HasOr
 
                 addComponentAtIndex(indexOf(formButtons), phonyItem)
                 setColspan(phonyItem, 2)
-                addRecord(LoadItemField(listOf("MERCE 1 ", "MERCE 2"), order.location.positions ))
+                addRecord(LoadItemField(items, order.location.positions ))
             } else {
                 Notification.show("Scan Only. Register Order")
             }

@@ -131,7 +131,7 @@ class MainView(
             OrderSubject.INTERNAL
         )
 
-        add(OrderForm(storage.findUsers(), order))
+        add(OrderForm(order, storage.findUsers(), storage.findItems()))
 
     }
 

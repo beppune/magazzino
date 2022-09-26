@@ -37,6 +37,8 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
                 "AreaAppartenenza AS area, Permesso AS permission FROM utenti WHERE UserID LIKE ?"
 
         const val UUSERS_QUERY = "SELECT UserID AS uid, Nome AS firstName, Cognome AS secondName, Email AS email FROM utenti"
+
+        const val ITEMS_QUERY = "SELECT Descrizione AS nome FROM magazzino.merci ORDER BY Descrizione"
     }
 
     private val Rollback = MagazzinoApi(template)
@@ -216,5 +218,9 @@ class JdbcStorageRepository(private val template:JdbcTemplate) : StorageReposito
                     }
                 )
             }.last()
+    }
+
+    override fun findItems(): List<String> {
+        return template.queryForList(ITEMS_QUERY, String::class.java)
     }
 }
